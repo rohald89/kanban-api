@@ -7,6 +7,8 @@ const morgan = require('morgan');
 
 const PORT = process.env.PORT || 5000
 
+const authRouter = require('./routes/authRoutes');
+const userRouter = require('./routes/userRoutes');
 const boardRouter = require('./routes/boardRoutes');
 
 const { notFound, globalErrorHandler } = require('./middleware/errorHandling');
@@ -25,6 +27,8 @@ app.use(morgan("dev"));
 
 app.get('/', (req, res) => res.json({ message: "Welcome to the Kanban API"}))
 
+app.use('/api/auth', authRouter)
+app.use('/api/users', userRouter)
 app.use('/api/boards', boardRouter)
 
 app.use(notFound);

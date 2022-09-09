@@ -9,9 +9,15 @@ const taskSchema = new Schema({
         type: String,
         required: true,
     },
+    board: {
+        type: Schema.Types.ObjectId,
+        ref: 'Board',
+        required: true,
+    },
     column: {
         type: Schema.Types.ObjectId,
         ref: 'Column',
+        required: true,
     },
     subtasks: [
         {

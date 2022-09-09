@@ -37,8 +37,8 @@ const getSingleBoard = async(req, res) => {
  * @access Private
  */
 const createBoard = async(req, res) => {
-    const { user, name } = req.body;
-    const board = await Board.create({ name })
+    const { name } = req.body;
+    const board = await Board.create({ user: req.user.id, name })
     if(board) {
         res.status(201).json(board);
     } else {
