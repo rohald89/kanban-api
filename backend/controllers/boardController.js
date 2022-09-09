@@ -10,7 +10,25 @@ const getAllBoards = async(req, res) => {
     if(!boards.length) {
         return res.status(400).json({ message: 'No boards found' });
     }
-    res.status(200).json({ boards });
+    res.status(200).json(boards);
+}
+
+/**
+ * @desc Get single board
+ * @route GET /boards/:id
+ * @access Private
+ */
+const getSingleBoard = async(req, res) => {
+    const { id } = req.params;
+    if(!id) {
+        return res.status(400).json({ message: 'Board ID required' });
+    }
+    const board = await Board.findById(id).exec();
+
+    if(!board) {
+        return res.status(400).json({ message: 'No board found' });
+    }
+    res.status(200).json(board);
 }
 
 /**
@@ -22,7 +40,7 @@ const createBoard = async(req, res) => {
     const { user, name } = req.body;
     const board = await Board.create({ name })
     if(board) {
-        res.status(201).json({ message: 'Board created' });
+        res.status(201).json(board);
     } else {
         res.status(400).json({ message: 'Board not created' });
     }
@@ -34,8 +52,11 @@ const createBoard = async(req, res) => {
  * @access Private
  */
 const updateBoard = async(req, res) => {
-    const { id, user, name } = req.body;
-
+    const { user, name } = req.body;
+    const { id } = req.params;
+    if(!id) {
+        return res.status(400).json({ message: 'Board ID required' });
+    }
     const board = await Board.findById(id).exec();
 
     if(!board) {
@@ -53,14 +74,13 @@ const updateBoard = async(req, res) => {
  * @access Private
  */
 const deleteBoard = async(req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
 
     if(!id) {
         return res.status(400).json({ message: 'Board ID required' });
     }
 
     const board = await Board.findById(id).exec();
-    console.log(board)
 
     if(!board) {
         return res.status(400).json({ message: 'Board not found' });
@@ -70,4 +90,4 @@ const deleteBoard = async(req, res) => {
     res.json({ message: `Board ${deletedBoard.name} deleted`});
 }
 
-module.exports = { getAllBoards, createBoard, updateBoard, deleteBoard }
+module.exports = { getAllBoards, getSingleBoard, createBoard, updateBoard, deleteBoard }
