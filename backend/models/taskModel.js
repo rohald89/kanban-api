@@ -9,8 +9,13 @@ const taskSchema = Schema({
         type: String,
         required: true,
     },
+    // status: {
+    //     type: String,
+    //     required: true,
+    // },
     status: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Column',
         required: true,
     },
     subtasks: [

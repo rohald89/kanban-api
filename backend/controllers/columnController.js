@@ -1,20 +1,6 @@
 const { Board } = require('../models/boardModel');
 const { Column } = require('../models/columnModel');
-
-/**
- * @desc Get all boards
- * @route GET /boards
- * @access Private
- */
- const getAllColumns = async(req, res) => {
-    const columns = await Column.find();
-    if(!columns.length) {
-        return res.status(400).json({ message: 'No columns found' });
-    }
-
-    // const columns =
-    res.status(200).json(columns);
-}
+const Task = require('../models/taskModel');
 
 /**
  * @desc Create new column
@@ -35,9 +21,9 @@ const createColumn = async(req, res) => {
     }
 
     const column = await Column.create({ name, boardId });
-    board.columns.push(column._id);
+    await board.columns.push(column._id);
 
-    board.save();
+    await board.save();
     if(column) {
         res.status(201).json(column);
     } else {
@@ -51,7 +37,7 @@ const createColumn = async(req, res) => {
  * @access Private
  */
 const updateColumn = async(req, res) => {
-    const { user, name } = req.body;
+    const { name } = req.body;
     const { id } = req.params;
     if(!id) {
         return res.status(400).json({ message: 'Column ID required' });
@@ -63,6 +49,7 @@ const updateColumn = async(req, res) => {
     }
 
     column.name = name;
+
     const updatedColumn = await column.save();
 
     res.json({ message: `Column ${updatedColumn.name} updated`});
@@ -73,6 +60,7 @@ const updateColumn = async(req, res) => {
  * @access Private
  */
 const deleteColumn = async(req, res) => {
+    // TODO MAKE SURE THAT ALL TASKS IN THE COLUMN ARE DELETED AS WELL
     const { id } = req.params;
 
     if(!id) {
@@ -85,8 +73,8 @@ const deleteColumn = async(req, res) => {
         return res.status(400).json({ message: 'Column not found' });
     }
 
-    const deletedColumn = await column.deleteOne();
-    res.json({ message: `Column ${deletedColumn.name} deleted`});
+    await column.deleteOne();
+    res.json({ message: `Column ${column.name} deleted`});
 }
 
-module.exports = { getAllColumns, createColumn, updateColumn, deleteColumn }
+module.exports = { createColumn, updateColumn, deleteColumn }

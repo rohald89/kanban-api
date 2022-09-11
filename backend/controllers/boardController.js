@@ -26,7 +26,7 @@ const getSingleBoard = async(req, res) => {
         return res.status(400).json({ message: 'Board ID required' });
     }
 
-    const board = await Board.findById(id).populate('columns', '_id name tasks').populate('tasks').exec();
+    const board = await Board.findById(id).populate('columns', '_id name tasks').populate({ path: 'tasks', populate: {path: 'status', model: 'Column', select: 'name' }}).exec();
 
     if(!board) {
         return res.status(400).json({ message: 'No board found' });

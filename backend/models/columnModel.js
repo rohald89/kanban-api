@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const Task = require('./taskModel');
 
 
 const columnSchema = new Schema({
@@ -22,6 +23,13 @@ const columnSchema = new Schema({
         },
     ],
 });
+
+columnSchema.pre("deleteOne", { document: true }, async function (next) {
+    console.log("deleteOne pre hook", this._id);
+    await Task.deleteMany({ status: this._id });
+    // console.log(tasks);
+    next();
+})
 
 const Column = model("Column", columnSchema);
 module.exports = {Column};

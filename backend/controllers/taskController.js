@@ -1,22 +1,7 @@
-// const {Task} = require('../models/boardModel');
-
 const { Board } = require('../models/boardModel');
+const { Column } = require('../models/columnModel');
 const Task = require('../models/taskModel');
 
-/**
- * @desc Get all tasks
- * @route GET /tasks
- * @access Private
- */
- const getAllTasks = async(req, res) => {
-    const tasks = await Task.find().populate('board');
-    if(!tasks.length) {
-        return res.status(400).json({ message: 'No tasks found' });
-    }
-
-    // const tasks =
-    res.status(200).json(tasks);
-}
 
 /**
  * @desc Get single Task
@@ -30,7 +15,6 @@ const Task = require('../models/taskModel');
     //     return res.status(400).json({ message: 'No tasks found' });
     // }
 
-    // const tasks =
     res.status(200).json(task);
 }
 
@@ -40,13 +24,22 @@ const Task = require('../models/taskModel');
  * @access Private
  */
 const createTask = async(req, res) => {
-    console.log('createTask', req.body)
     const { title, description, status, boardId } = req.body;
     const task = await Task.create({ title, description, status, boardId })
 
     const board = await Board.findById(boardId).exec();
-    board.tasks.push(task._id);
-    board.save();
+    await board.tasks.push(task._id);
+    await board.save();
+
+    const column = await Column.findById(status).exec();
+    console.log(column);
+    if (column) {
+        column.tasks.push(task._id);
+        await column.save();
+    } else {
+        return res.status(400).json({ message: 'Column not found' });
+    }
+
     if(task) {
         res.status(201).json(task);
     } else {
@@ -98,4 +91,4 @@ const deleteTask = async(req, res) => {
     res.json({ message: `Task ${deletedTask.name} deleted`});
 }
 
-module.exports = { getAllTasks, getSingleTask, createTask, updateTask, deleteTask }
+module.exports = { getSingleTask, createTask, updateTask, deleteTask }
