@@ -32,7 +32,6 @@ const createTask = async(req, res) => {
     await board.save();
 
     const column = await Column.findById(status).exec();
-    console.log(column);
     if (column) {
         column.tasks.push(task._id);
         await column.save();
@@ -53,7 +52,7 @@ const createTask = async(req, res) => {
  * @access Private
  */
 const updateTask = async(req, res) => {
-    const { user, name } = req.body;
+    const { title, description, status } = req.body;
     const { id } = req.params;
     if(!id) {
         return res.status(400).json({ message: 'Task ID required' });
@@ -64,10 +63,24 @@ const updateTask = async(req, res) => {
         return res.status(400).json({ message: 'Task not found' });
     }
 
-    task.name = name;
+    task.title = title;
+    task.description = description;
+
+    if (status) {
+        const column = await Column.findById(status).exec();
+        if (column) {
+            const prevColumn = await Column.findById(task.status).exec();
+            console.log(prevColumn);
+            prevColumn.tasks = prevColumn.tasks.filter(taskId => taskId.toString() !== task._id.toString());
+            await prevColumn.save();
+            column.tasks.push(task._id);
+            await column.save();
+        }
+        task.status = status;
+    }
     const updatedTask = await task.save();
 
-    res.json({ message: `Task ${updatedTask.name} updated`});
+    res.json({ message: `Task ${updatedTask.title} updated`});
 }
 /**
  * @desc Delete task
@@ -87,8 +100,8 @@ const deleteTask = async(req, res) => {
         return res.status(400).json({ message: 'Task not found' });
     }
 
-    const deletedTask = await task.deleteOne();
-    res.json({ message: `Task ${deletedTask.name} deleted`});
+    await task.deleteOne();
+    res.json({ message: `Task ${task.title} deleted`});
 }
 
 module.exports = { getSingleTask, createTask, updateTask, deleteTask }
