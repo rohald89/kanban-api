@@ -1,4 +1,5 @@
-const Board = require('../models/boardModel');
+const { Board } = require('../models/boardModel');
+const Task = require('../models/taskModel');
 
 /**
  * @desc Get all boards
@@ -6,7 +7,7 @@ const Board = require('../models/boardModel');
  * @access Private
  */
 const getAllBoards = async(req, res) => {
-    const boards = await Board.find().lean();
+    const boards = await Board.find().populate('tasks');
     if(!boards.length) {
         return res.status(400).json({ message: 'No boards found' });
     }
@@ -20,14 +21,17 @@ const getAllBoards = async(req, res) => {
  */
 const getSingleBoard = async(req, res) => {
     const { id } = req.params;
+
     if(!id) {
         return res.status(400).json({ message: 'Board ID required' });
     }
-    const board = await Board.findById(id).exec();
+
+    const board = await Board.findById(id).populate('columns', '_id name tasks').populate('tasks').exec();
 
     if(!board) {
         return res.status(400).json({ message: 'No board found' });
     }
+
     res.status(200).json(board);
 }
 
@@ -90,4 +94,11 @@ const deleteBoard = async(req, res) => {
     res.json({ message: `Board ${deletedBoard.name} deleted`});
 }
 
-module.exports = { getAllBoards, getSingleBoard, createBoard, updateBoard, deleteBoard }
+
+module.exports = {
+    getAllBoards,
+    getSingleBoard,
+    createBoard,
+    updateBoard,
+    deleteBoard,
+}

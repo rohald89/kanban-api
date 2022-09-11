@@ -9,6 +9,11 @@ const subTaskSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    task: {
+        type: Schema.Types.ObjectId,
+        ref: 'Task',
+    }
 });
 
-module.exports = model('Subtask', subTaskSchema);
+const SubTask = model('Subtask', subTaskSchema);
+module.exports = SubTask

@@ -1,7 +1,7 @@
-const {Schema, model} = require('mongoose');
+const { Schema, model } = require('mongoose');
 
 
-const boardSchema = new Schema({
+const boardSchema = Schema({
     user: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -11,14 +11,11 @@ const boardSchema = new Schema({
         type: String,
         required: true
     },
-    columns: {
-        type: [Schema.Types.ObjectId],
-        ref: 'Column',
-    },
-    tasks: {
-        type: [Schema.Types.ObjectId],
-        ref: 'Task'
-    }
+    tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
+    columns: [{ type: Schema.Types.ObjectId, ref: 'Column' }],
+    // tasks: [taskSchema],
 })
 
-module.exports = model('Board', boardSchema);
+const Board = model('Board', boardSchema);
+
+module.exports = { Board };

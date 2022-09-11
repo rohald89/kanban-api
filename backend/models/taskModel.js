@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
+const { Schema, model } = require('mongoose');
 
-const taskSchema = new Schema({
+const taskSchema = Schema({
     title: {
         type: String,
         required: true,
@@ -9,14 +9,8 @@ const taskSchema = new Schema({
         type: String,
         required: true,
     },
-    board: {
-        type: Schema.Types.ObjectId,
-        ref: 'Board',
-        required: true,
-    },
-    column: {
-        type: Schema.Types.ObjectId,
-        ref: 'Column',
+    status: {
+        type: String,
         required: true,
     },
     subtasks: [
@@ -25,6 +19,8 @@ const taskSchema = new Schema({
             ref: 'Subtask',
         },
     ],
+    boardId: { type: Schema.Types.ObjectId, ref: 'Board', required: true }
 });
 
-module.exports = model('Task', taskSchema);
+const Task = model('Task', taskSchema);
+module.exports = Task;

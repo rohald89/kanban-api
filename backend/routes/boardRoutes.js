@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllBoards, createBoard, updateBoard, deleteBoard, getSingleBoard } = require('../controllers/boardController');
+const { getAllBoards, createBoard, updateBoard, deleteBoard, getSingleBoard, addColumn, addTask } = require('../controllers/boardController');
 const verifyAuth = require('../middleware/verifyAuth');
 
 const router = express.Router();
@@ -14,5 +14,11 @@ router.route('/:id')
     .get(getSingleBoard)
     .patch(updateBoard)
     .delete(deleteBoard);
+
+// router.route('/:id/columns')
+//     .post(addColumn)
+
+// router.route('/:id/tasks')
+//     .post(addTask)
 
 module.exports = router;

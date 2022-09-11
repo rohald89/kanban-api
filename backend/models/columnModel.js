@@ -1,12 +1,18 @@
-import { Schema, model } from "mongoose";
+const { Schema, model } = require('mongoose');
+
 
 const columnSchema = new Schema({
     name: {
         type: String,
         required: true,
     },
-    color: {
-        type: String,
+    // color: {
+    //     type: String,
+    //     required: true,
+    // },
+    boardId: {
+        type: Schema.Types.ObjectId,
+        ref: "Board",
         required: true,
     },
     tasks: [
@@ -17,4 +23,5 @@ const columnSchema = new Schema({
     ],
 });
 
-module.exports = model("Column", columnSchema);
+const Column = model("Column", columnSchema);
+module.exports = {Column};
