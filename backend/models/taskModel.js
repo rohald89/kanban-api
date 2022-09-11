@@ -29,6 +29,28 @@ taskSchema.pre("deleteOne", { document: true }, async function (next) {
     next();
 })
 
+taskSchema.pre("updateOne", { document: true }, async function (next) {
+    // New status
+    const { status } = this._update;
+    console.log('Task Id', this._conditions._id);
+    // If status is changed
+
+    if (status) {
+        // Remove task from old column
+        await Column.updateOne({ tasks: this._conditions._id }, { $pull: { tasks: this._conditions._id } });
+        // await Column.updateOne({ _id: this.status }, { $pull: { tasks: this._conditions._id } });
+        // Add task to new column
+        await Column.updateOne({ _id: this._update.status }, { $push: { tasks: this._conditions._id } });
+    }
+
+    // if (status) {
+    //     await Column.updateOne({ _id: prevStatus }, { $pull: { tasks: this._id } });
+    //     await Column.updateOne({ _id: status }, { $push: { tasks: this._id } });
+    // }
+    next();
+})
+
+
 
 const Task = model('Task', taskSchema);
 module.exports = Task;

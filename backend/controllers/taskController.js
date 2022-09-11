@@ -57,30 +57,27 @@ const updateTask = async(req, res) => {
     if(!id) {
         return res.status(400).json({ message: 'Task ID required' });
     }
-    const task = await Task.findById(id).exec();
+    const task = await Task.updateOne({ _id: id }, { title, description, status }).exec();
 
     if(!task) {
         return res.status(400).json({ message: 'Task not found' });
     }
 
-    task.title = title;
-    task.description = description;
+    // if (status) {
+    //     const column = await Column.findById(status).exec();
+    //     if (column) {
+    //         const prevColumn = await Column.findById(task.status).exec();
+    //         console.log(prevColumn);
+    //         prevColumn.tasks = prevColumn.tasks.filter(taskId => taskId.toString() !== task._id.toString());
+    //         await prevColumn.save();
+    //         column.tasks.push(task._id);
+    //         await column.save();
+    //     }
+    //     task.status = status;
+    // }
+    // const updatedTask = await task.save();
 
-    if (status) {
-        const column = await Column.findById(status).exec();
-        if (column) {
-            const prevColumn = await Column.findById(task.status).exec();
-            console.log(prevColumn);
-            prevColumn.tasks = prevColumn.tasks.filter(taskId => taskId.toString() !== task._id.toString());
-            await prevColumn.save();
-            column.tasks.push(task._id);
-            await column.save();
-        }
-        task.status = status;
-    }
-    const updatedTask = await task.save();
-
-    res.json({ message: `Task ${updatedTask.title} updated`});
+    res.json({ message: `Task ${task.title} updated`});
 }
 /**
  * @desc Delete task

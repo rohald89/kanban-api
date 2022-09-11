@@ -25,9 +25,7 @@ const columnSchema = new Schema({
 });
 
 columnSchema.pre("deleteOne", { document: true }, async function (next) {
-    console.log("deleteOne pre hook", this._id);
     await Task.deleteMany({ status: this._id });
-    // console.log(tasks);
     next();
 })
 
