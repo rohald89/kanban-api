@@ -1,5 +1,5 @@
-const { Board } = require('../models/boardModel');
-const { Column } = require('../models/columnModel');
+const Board = require('../models/boardModel');
+const Column = require('../models/columnModel');
 const Task = require('../models/taskModel');
 
 

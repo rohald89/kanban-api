@@ -7,10 +7,6 @@ const columnSchema = new Schema({
         type: String,
         required: true,
     },
-    // color: {
-    //     type: String,
-    //     required: true,
-    // },
     boardId: {
         type: Schema.Types.ObjectId,
         ref: "Board",
@@ -29,5 +25,5 @@ columnSchema.pre("deleteOne", { document: true }, async function (next) {
     next();
 })
 
-const Column = model("Column", columnSchema);
-module.exports = {Column};
+const Column = model('Column', columnSchema);
+module.exports = Column;

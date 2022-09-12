@@ -1,6 +1,5 @@
-const { Board } = require('../models/boardModel');
-const { Column } = require('../models/columnModel');
-const Task = require('../models/taskModel');
+const Board = require('../models/boardModel');
+const Column = require('../models/columnModel');
 
 /**
  * @desc Create new column

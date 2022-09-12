@@ -15,10 +15,4 @@ router.route('/:id')
     .patch(updateBoard)
     .delete(deleteBoard);
 
-// router.route('/:id/columns')
-//     .post(addColumn)
-
-// router.route('/:id/tasks')
-//     .post(addTask)
-
 module.exports = router;

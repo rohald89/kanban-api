@@ -1,16 +1,5 @@
 const { Schema, model } = require('mongoose');
-const { Column } = require('./columnModel');
-
-const subTaskSchema = new Schema({
-    title: {
-        type: String,
-        required: true,
-    },
-    isCompleted: {
-        type: Boolean,
-        default: false,
-    }
-});
+const Column = require('./columnModel');
 
 const taskSchema = Schema({
     title: {
@@ -53,8 +42,6 @@ taskSchema.pre("updateOne", { document: true }, async function (next) {
     }
     next();
 })
-
-
 
 const Task = model('Task', taskSchema);
 module.exports = Task;

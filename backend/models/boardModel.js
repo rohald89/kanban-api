@@ -1,5 +1,5 @@
 const { Schema, model } = require('mongoose');
-const { Column } = require('./columnModel');
+const Column = require('./columnModel');
 const Task = require('./taskModel');
 
 
@@ -24,5 +24,4 @@ boardSchema.pre("deleteOne", { document: true }, async function (next) {
 })
 
 const Board = model('Board', boardSchema);
-
-module.exports = { Board };
+module.exports = Board;

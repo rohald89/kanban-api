@@ -1,10 +1,10 @@
 const express = require('express');
 const { createTask, updateTask, deleteTask, getSingleTask } = require('../controllers/taskController');
-// const verifyAuth = require('../middleware/verifyAuth');
+const verifyAuth = require('../middleware/verifyAuth');
 
 const router = express.Router();
 
-// router.use(verifyAuth)
+router.use(verifyAuth)
 
 router.route('/')
     .post(createTask)
