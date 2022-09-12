@@ -24,8 +24,8 @@ const Task = require('../models/taskModel');
  * @access Private
  */
 const createTask = async(req, res) => {
-    const { title, description, status, boardId } = req.body;
-    const task = await Task.create({ title, description, status, boardId })
+    const { title, description, status, boardId, subtasks } = req.body;
+    const task = await Task.create({ title, description, subtasks, status, boardId })
 
     const board = await Board.findById(boardId).exec();
     await board.tasks.push(task._id);
@@ -52,31 +52,50 @@ const createTask = async(req, res) => {
  * @access Private
  */
 const updateTask = async(req, res) => {
-    const { title, description, status } = req.body;
+    const { title, description, subtasks, status, source, destination } = req.body;
     const { id } = req.params;
     if(!id) {
         return res.status(400).json({ message: 'Task ID required' });
     }
-    const task = await Task.updateOne({ _id: id }, { title, description, status }).exec();
+    const task = await Task.updateOne({ _id: id }, { title, description, subtasks, status }).exec();
 
     if(!task) {
         return res.status(400).json({ message: 'Task not found' });
     }
 
-    // if (status) {
-    //     const column = await Column.findById(status).exec();
-    //     if (column) {
-    //         const prevColumn = await Column.findById(task.status).exec();
-    //         console.log(prevColumn);
-    //         prevColumn.tasks = prevColumn.tasks.filter(taskId => taskId.toString() !== task._id.toString());
-    //         await prevColumn.save();
-    //         column.tasks.push(task._id);
-    //         await column.save();
-    //     }
-    //     task.status = status;
-    // }
-    // const updatedTask = await task.save();
+    if (source && destination) {
+        if (source.droppableId === destination.droppableId
+            && source.index === destination.index) {
+                return res.status(200).json({ message: 'Task updated' });
+            }
 
+        if(source.droppableId === destination.droppableId) {
+            // ! When moving tasks from 0 -> 1 index task the task on 1 index is being overwritten
+            // const column = await Column.findById(source.droppableId).exec();
+
+            // const tasks = [...column.tasks];
+            // console.log(tasks);
+            // let [oldValue, newValue] = [tasks[source.index], tasks[destination.index]];
+            // // console.log(tasks);
+            // // tasks.set(source.index, newValue);
+            // // console.log(tasks);
+            // // tasks.set(destination.index, oldValue);
+            // tasks.splice(source.index, 1);
+            // console.log(tasks);
+            // tasks.splice(destination.index, 0, id);
+            // // console.log(tasks);
+            // console.log(tasks);
+            // column.set({tasks});
+            // await column.save();
+        } else {
+            const sourceColumn = await Column.findById(source.droppableId).exec();
+            sourceColumn.tasks.splice(source.index, 1);
+            await sourceColumn.save();
+            const destinationColumn = await Column.findById(destination.droppableId).exec();
+            destinationColumn.tasks.splice(destination.index, 0, id);
+            await destinationColumn.save();
+        }
+    }
     res.json({ message: `Task ${task.title} updated`});
 }
 /**

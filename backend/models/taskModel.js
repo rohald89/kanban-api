@@ -1,6 +1,17 @@
 const { Schema, model } = require('mongoose');
 const { Column } = require('./columnModel');
 
+const subTaskSchema = new Schema({
+    title: {
+        type: String,
+        required: true,
+    },
+    isCompleted: {
+        type: Boolean,
+        default: false,
+    }
+});
+
 const taskSchema = Schema({
     title: {
         type: String,
@@ -17,9 +28,9 @@ const taskSchema = Schema({
     },
     subtasks: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'Subtask',
-        },
+            title: String,
+            isCompleted: Boolean,
+        }
     ],
     boardId: { type: Schema.Types.ObjectId, ref: 'Board', required: true }
 });
@@ -32,21 +43,14 @@ taskSchema.pre("deleteOne", { document: true }, async function (next) {
 taskSchema.pre("updateOne", { document: true }, async function (next) {
     // New status
     const { status } = this._update;
-    console.log('Task Id', this._conditions._id);
-    // If status is changed
+    const task = this._conditions._id;
 
     if (status) {
         // Remove task from old column
-        await Column.updateOne({ tasks: this._conditions._id }, { $pull: { tasks: this._conditions._id } });
-        // await Column.updateOne({ _id: this.status }, { $pull: { tasks: this._conditions._id } });
+        await Column.updateOne({ tasks: task }, { $pull: { tasks: task } });
         // Add task to new column
-        await Column.updateOne({ _id: this._update.status }, { $push: { tasks: this._conditions._id } });
+        await Column.updateOne({ _id: this._update.status }, { $push: { tasks: task } });
     }
-
-    // if (status) {
-    //     await Column.updateOne({ _id: prevStatus }, { $pull: { tasks: this._id } });
-    //     await Column.updateOne({ _id: status }, { $push: { tasks: this._id } });
-    // }
     next();
 })
 
