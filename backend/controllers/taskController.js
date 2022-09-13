@@ -11,9 +11,13 @@ const Task = require('../models/taskModel');
  const getSingleTask = async(req, res) => {
     const { id } = req.params;
     const task = await Task.findById(id).populate('subtasks').exec();
-    // if(!tasks.length) {
-    //     return res.status(400).json({ message: 'No tasks found' });
-    // }
+
+    if(!task) {
+        return res.status(400).json({ message: 'Task not found' });
+    }
+    if(task.user.toString() !== req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     res.status(200).json(task);
 }
@@ -25,9 +29,13 @@ const Task = require('../models/taskModel');
  */
 const createTask = async(req, res) => {
     const { title, description, status, boardId, subtasks } = req.body;
-    const task = await Task.create({ title, description, subtasks, status, boardId })
+    const task = await Task.create({ user: req.user.id, title, description, subtasks, status, boardId })
 
     const board = await Board.findById(boardId).exec();
+    if(req.user.id !== board.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
     await board.tasks.push(task._id);
     await board.save();
 
@@ -59,6 +67,9 @@ const updateTask = async(req, res) => {
     }
     const task = await Task.updateOne({ _id: id }, { title, description, subtasks, status }).exec();
 
+    if(req.user.id !== task.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     if(!task) {
         return res.status(400).json({ message: 'Task not found' });
     }
@@ -112,6 +123,9 @@ const deleteTask = async(req, res) => {
 
     const task = await Task.findById(id).exec();
 
+    if(req.user.id !== task.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     if(!task) {
         return res.status(400).json({ message: 'Task not found' });
     }

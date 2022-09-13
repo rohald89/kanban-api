@@ -7,13 +7,14 @@ const User = require('../models/userModel');
  * @route GET /users
  * @access Private
  */
-const getAllUsers = async (req, res) =>  {
-    const users = await User.find().lean()
-    if(!users?.length) {
-        return res.status(400).json({ message: "No users found" })
-    }
-    res.json(users)
-};
+// ? Might be able to use this at a later stage for collaboration on a single board
+// const getAllUsers = async (req, res) =>  {
+//     const users = await User.find().lean()
+//     if(!users?.length) {
+//         return res.status(400).json({ message: "No users found" })
+//     }
+//     res.json(users)
+// };
 
 /**
  * @desc Create new user
@@ -40,6 +41,7 @@ const createNewUser = async (req, res) =>  {
 
     const userObject = { firstName, lastName, emailAddress, "password": hashedPassword }
 
+    console.log(userObject);
     // create new user
     const user = await User.create(userObject)
     if(user) {
@@ -55,10 +57,10 @@ const createNewUser = async (req, res) =>  {
  * @access Private
  */
 const updateUser = async (req, res) =>  {
-    const { id, emailAddress, roles, active, password } = req.body;
+    const { firstName, lastName, emailAddress, password } = req.body;
+    const { id } = req.params;
 
-    console.log(typeof active)
-    if(!id || !emailAddress || !Array.isArray(roles) || !roles.length || typeof active !== "boolean") {
+    if( !firstName || !lastName || !emailAddress) {
         return res.status(400).json({ message: "All fields are required" })
     }
 
@@ -73,9 +75,9 @@ const updateUser = async (req, res) =>  {
         return res.status(409).json({ message: 'Duplicate emailAddress'})
     }
 
-    user.emailAddress = emailAddress
-    user.roles = roles
-    user.active = active
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.emailAddress = emailAddress;
 
     if(password) {
         user.password = await bcrypt.hash(password, 10);
@@ -92,7 +94,7 @@ const updateUser = async (req, res) =>  {
  * @access Private
  */
 const deleteUser = async (req, res) =>  {
-    const { id } = req.body;
+    const { id } = req.params;
 
     if(!id) {
         return res.status(400).json({ message: "User ID required" })
@@ -114,4 +116,4 @@ const deleteUser = async (req, res) =>  {
     res.json(reply);
 };
 
-module.exports = { getAllUsers, createNewUser, updateUser, deleteUser };
+module.exports = { createNewUser, updateUser, deleteUser };

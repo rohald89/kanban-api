@@ -18,8 +18,11 @@ const createColumn = async(req, res) => {
     if(!board) {
         return res.status(400).json({ message: 'Board not found' });
     }
+    if(board.user.toString() !== req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
-    const column = await Column.create({ name, boardId });
+    const column = await Column.create({ user: req.user.id, name, boardId });
     await board.columns.push(column._id);
 
     await board.save();
@@ -43,6 +46,9 @@ const updateColumn = async(req, res) => {
     }
     const column = await Column.findById(id).exec();
 
+    if(req.user.id !== column.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     if(!column) {
         return res.status(400).json({ message: 'Column not found' });
     }
@@ -59,7 +65,6 @@ const updateColumn = async(req, res) => {
  * @access Private
  */
 const deleteColumn = async(req, res) => {
-    // TODO MAKE SURE THAT ALL TASKS IN THE COLUMN ARE DELETED AS WELL
     const { id } = req.params;
 
     if(!id) {
@@ -68,6 +73,9 @@ const deleteColumn = async(req, res) => {
 
     const column = await Column.findById(id).exec();
 
+    if(req.user.id !== column.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     if(!column) {
         return res.status(400).json({ message: 'Column not found' });
     }

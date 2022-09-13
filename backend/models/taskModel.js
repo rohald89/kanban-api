@@ -2,6 +2,11 @@ const { Schema, model } = require('mongoose');
 const Column = require('./columnModel');
 
 const taskSchema = Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
     title: {
         type: String,
         required: true,

@@ -6,7 +6,7 @@ const Board = require('../models/boardModel');
  * @access Private
  */
 const getAllBoards = async(req, res) => {
-    const boards = await Board.find().populate('tasks');
+    const boards = await Board.find({ user: req.user.id }).populate('tasks');
     if(!boards.length) {
         return res.status(400).json({ message: 'No boards found' });
     }
@@ -21,6 +21,7 @@ const getAllBoards = async(req, res) => {
 const getSingleBoard = async(req, res) => {
     const { id } = req.params;
 
+
     if(!id) {
         return res.status(400).json({ message: 'Board ID required' });
     }
@@ -32,6 +33,10 @@ const getSingleBoard = async(req, res) => {
             select: '_id name tasks'})
         .populate({ path: 'tasks', populate: {path: 'status', model: 'Column', select: 'name' }})
         .exec();
+
+    if(req.user.id !== board.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     if(!board) {
         return res.status(400).json({ message: 'No board found' });
@@ -61,12 +66,16 @@ const createBoard = async(req, res) => {
  * @access Private
  */
 const updateBoard = async(req, res) => {
-    const { user, name } = req.body;
+    const { name } = req.body;
     const { id } = req.params;
     if(!id) {
         return res.status(400).json({ message: 'Board ID required' });
     }
     const board = await Board.findById(id).exec();
+
+    if(req.user.id !== board.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     if(!board) {
         return res.status(400).json({ message: 'Board not found' });
@@ -90,6 +99,9 @@ const deleteBoard = async(req, res) => {
     }
 
     const board = await Board.findById(id).exec();
+    if(req.user.id !== board.user.toString()) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     if(!board) {
         return res.status(400).json({ message: 'Board not found' });

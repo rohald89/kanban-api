@@ -3,6 +3,11 @@ const Task = require('./taskModel');
 
 
 const columnSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
     name: {
         type: String,
         required: true,
