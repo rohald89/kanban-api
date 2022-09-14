@@ -1,7 +1,8 @@
-const User = require('../models/userModel');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const User = require('../models/userModel');
 /**
  * @desc Login
  * @route POST /auth
@@ -106,6 +107,7 @@ const logout = (req, res) => {
  */
 const forgotPassword = async (req, res) => {
     const { emailAddress } = req.body;
+    console.log(req.body);
     if(!emailAddress) return res.status(400).json({ message: 'Email address is required' });
 
     const foundUser = await User.findOne({ emailAddress }).exec();
@@ -113,12 +115,43 @@ const forgotPassword = async (req, res) => {
 
     const resetToken = jwt.sign({_id: foundUser._id}, process.env.RESET_TOKEN_SECRET, { expiresIn: '15m' });
 
+
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emailAddress,
+        subject: 'Password Reset',
+        html: `
+            <p>You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p>
+            <p>Please click on the following link, or paste this into your browser to complete the process within 15 minutes of receiving it:</p>
+            <a href="${process.env.CLIENT_URL}/reset?token=${resetToken}">Reset Password</a>
+        `,
+        }
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if(error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        res.json({ message: 'Email sent' });
+    });
+
     foundUser.resetToken = resetToken;
     await foundUser.save();
 
-    // ! Send email with resetToken
 
-    res.json({ message: 'Reset token generated', resetToken });
+
+    res.json({ message: 'Reset token sent to email address' });
 }
 
 /**
@@ -128,6 +161,7 @@ const forgotPassword = async (req, res) => {
  */
 const resetPassword = async (req, res) => {
     const { resetToken, password } = req.body;
+    console.log(req.body);
     if(!resetToken || !password) return res.status(400).json({ message: 'All fields are required' });
 
     jwt.verify(resetToken, process.env.RESET_TOKEN_SECRET, async (error, decoded) => {
