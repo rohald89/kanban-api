@@ -17,6 +17,10 @@ const userSchema = Schema({
         type: String,
         required: true,
     },
+    resetToken: {
+        type: String,
+        default: null,
+    },
     boards: [
         {
             type: Schema.Types.ObjectId,

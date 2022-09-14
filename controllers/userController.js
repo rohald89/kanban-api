@@ -8,13 +8,13 @@ const User = require('../models/userModel');
  * @access Private
  */
 // ? Might be able to use this at a later stage for collaboration on a single board
-// const getAllUsers = async (req, res) =>  {
-//     const users = await User.find().lean()
-//     if(!users?.length) {
-//         return res.status(400).json({ message: "No users found" })
-//     }
-//     res.json(users)
-// };
+const getAllUsers = async (req, res) =>  {
+    const users = await User.find().lean()
+    if(!users?.length) {
+        return res.status(400).json({ message: "No users found" })
+    }
+    res.json(users)
+};
 
 /**
  * @desc Create new user
@@ -116,4 +116,4 @@ const deleteUser = async (req, res) =>  {
     res.json(reply);
 };
 
-module.exports = { createNewUser, updateUser, deleteUser };
+module.exports = { getAllUsers, createNewUser, updateUser, deleteUser };
