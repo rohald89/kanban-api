@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 5000
 
@@ -16,7 +17,6 @@ const taskRouter = require('./routes/taskRoutes');
 const { notFound, globalErrorHandler } = require('./middleware/errorHandling');
 const corsOptions = require('./config/corsOptions');
 const connectToDB = require('./config/dbConnection');
-const { default: mongoose } = require('mongoose');
 
 connectToDB();
 
@@ -26,8 +26,6 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(morgan("dev"));
-
-app.get('/', (req, res) => res.json({ message: "Welcome to the Kanban API"}))
 
 app.use('/api/auth', authRouter)
 app.use('/api/users', userRouter)

@@ -107,7 +107,6 @@ const logout = (req, res) => {
  */
 const forgotPassword = async (req, res) => {
     const { emailAddress } = req.body;
-    console.log(req.body);
     if(!emailAddress) return res.status(400).json({ message: 'Email address is required' });
 
     const foundUser = await User.findOne({ emailAddress }).exec();
@@ -148,8 +147,6 @@ const forgotPassword = async (req, res) => {
 
     foundUser.resetToken = resetToken;
     await foundUser.save();
-
-
 
     res.json({ message: 'Reset token sent to email address' });
 }
